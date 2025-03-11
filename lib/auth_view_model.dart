@@ -69,7 +69,18 @@ class AuthViewModel with ChangeNotifier {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        _user = User.fromJson(data);
+
+        // Handling List<dynamic> or Map<String, dynamic>
+        if (data is List && data.isNotEmpty) {
+          _user =
+              User.fromJson(data[0]); // Take first user if response is a list
+        } else if (data is Map<String, dynamic>) {
+          _user = User.fromJson(data);
+        } else {
+          print("Unexpected response format: $data");
+          return;
+        }
+
         print("User Info Fetched: $_user"); // Debugging
       } else {
         print("Failed to Fetch User Info: ${response.body}"); // Debugging
