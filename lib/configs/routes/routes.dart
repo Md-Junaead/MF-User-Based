@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:v1_micro_finance/configs/routes/routes_name.dart';
 import 'package:v1_micro_finance/login_screen.dart';
-import 'package:v1_micro_finance/user_profile_screen.dart';
+import 'package:v1_micro_finance/user_info_screen.dart';
 
 class Routes {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -12,9 +12,9 @@ class Routes {
         return MaterialPageRoute(
             builder: (BuildContext context) => LoginScreen());
 
-      case RoutesName.userProfileScreen:
+      case RoutesName.userInfoScreen:
         return MaterialPageRoute(
-            builder: (BuildContext context) => UserProfileScreen());
+            builder: (BuildContext context) => UserInfoScreen());
 
       default:
         return MaterialPageRoute(builder: (_) {

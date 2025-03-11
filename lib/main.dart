@@ -1,24 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:v1_micro_finance/auth_view_model.dart';
 import 'package:v1_micro_finance/login_screen.dart';
-import 'package:v1_micro_finance/login_view_model.dart';
+import 'package:v1_micro_finance/user_info_screen.dart';
 
 void main() {
-  runApp(const MainApp());
+  runApp(MyApp());
 }
 
-class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => LoginViewModel()),
+        ChangeNotifierProvider(create: (context) => AuthViewModel()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: LoginScreen(),
+        title: 'Flutter App',
+        initialRoute: '/',
+        routes: {
+          '/': (context) => LoginScreen(),
+          '/userInfo': (context) => UserInfoScreen(),
+        },
       ),
     );
   }

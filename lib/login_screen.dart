@@ -1,107 +1,70 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:v1_micro_finance/login_view_model.dart';
-import 'package:v1_micro_finance/user_profile_screen.dart';
+import 'package:v1_micro_finance/auth_view_model.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
+  @override
+  // ignore: library_private_types_in_public_api
+  _LoginScreenState createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-
-  LoginScreen({super.key});
+  bool _obscureText = true;
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthViewModel>(context);
+
     return Scaffold(
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Bank Logo/Image
-              Center(
-                child: Image.asset(
-                  'assets/logos/login_icon_logo.png', // Ensure the logo path is correct
-                  height: 250,
+      appBar: AppBar(title: Text("Login")),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            TextField(
+              controller: _emailController,
+              decoration: InputDecoration(labelText: "Email"),
+            ),
+            TextField(
+              controller: _passwordController,
+              obscureText: _obscureText,
+              decoration: InputDecoration(
+                labelText: "Password",
+                suffixIcon: IconButton(
+                  icon: Icon(
+                      _obscureText ? Icons.visibility : Icons.visibility_off),
+                  onPressed: () {
+                    setState(() {
+                      _obscureText = !_obscureText;
+                    });
+                  },
                 ),
               ),
-              // Email Input Field
-              TextField(
-                controller: _emailController,
-                decoration: const InputDecoration(
-                  labelText: 'Email',
-                  border: OutlineInputBorder(),
-                ),
+            ),
+            SizedBox(height: 20),
+            authProvider.isLoading
+                ? CircularProgressIndicator()
+                : ElevatedButton(
+                    onPressed: () {
+                      authProvider.login(
+                        _emailController.text.trim(),
+                        _passwordController.text.trim(),
+                        context,
+                      );
+                    },
+                    child: Text("Login"),
+                  ),
+            if (authProvider.errorMessage != null)
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(authProvider.errorMessage!,
+                    style: TextStyle(color: Colors.red)),
               ),
-              const SizedBox(height: 16),
-              // Password Input Field
-              TextField(
-                controller: _passwordController,
-                obscureText: true,
-                decoration: const InputDecoration(
-                  labelText: 'Password',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 15),
-              // Log In Button
-              // Inside your Login Screen
-              Consumer<LoginViewModel>(
-                builder: (context, viewModel, child) {
-                  return viewModel.isLoading
-                      ? const CircularProgressIndicator()
-                      : ElevatedButton(
-                          onPressed: () async {
-                            String email = _emailController.text.trim();
-                            String password = _passwordController.text.trim();
-
-                            bool success =
-                                await viewModel.login(email, password);
-
-                            if (success) {
-                              // Navigate to the User Profile Screen after login
-                              Future.delayed(const Duration(milliseconds: 100),
-                                  () {
-                                Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            const UserProfileScreen()));
-                              });
-                            } else {
-                              // Show error message if login fails
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text("Invalid email or password"),
-                                ),
-                              );
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                              side: const BorderSide(
-                                color: Colors.black,
-                                width: 1.0,
-                              ),
-                            ),
-                          ),
-                          child: const Text(
-                            'LOG IN',
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: Color(0xFF06426D),
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        );
-                },
-              ),
-            ],
-          ),
+          ],
         ),
       ),
     );
